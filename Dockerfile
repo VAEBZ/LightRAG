@@ -26,6 +26,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Install curl for healthchecks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Copy only necessary files from builder
 COPY --from=builder /root/.local /root/.local
 COPY ./lightrag ./lightrag
@@ -42,8 +45,9 @@ RUN mkdir -p /app/data/rag_storage /app/data/inputs
 ENV WORKING_DIR=/app/data/rag_storage
 ENV INPUT_DIR=/app/data/inputs
 
-# Expose the default port
+# Expose both the API and MCP ports
 EXPOSE 9621
+EXPOSE 9626
 
-# Set entrypoint
-ENTRYPOINT ["python", "-m", "lightrag.api.lightrag_server"]
+# No default entrypoint to allow for flexibility
+# The command will be specified in docker-compose.yml
